@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <getopt.h>
 #include "errorUtils.h"
 
 static char buffer[BUFSIZ];
@@ -22,7 +23,7 @@ closeDestFiles(int * dest_fds , int filesNum);
 
 int main(int argc , char* argv[] , char* environp[])
 {
-    int src_fd ,filesNum, *dest_fds;
+    int src_fd ,filesNum, *dest_fds, opt;
     struct stat srcfile_stat;
     ssize_t rbytes , wbytes;
     size_t fileLen = BUFSIZ;
@@ -30,7 +31,21 @@ int main(int argc , char* argv[] , char* environp[])
     if(argc < 2)
         usageErr();
 
-    errorExit( stat(argv[1] , &srcfile_stat) , "stat()" );
+    while( (opt = getopt(argc , argv , "s:")) != -1)
+    {
+        switch (opt)
+        {
+        case 's':
+            fileLen = (size_t) atol(optarg);
+            break;
+        
+        default:
+            usageErr();
+            break;
+        }
+    }
+
+    errorExit( stat(argv[optind] , &srcfile_stat) , "stat()" );
 
 
     /**
@@ -44,10 +59,10 @@ int main(int argc , char* argv[] , char* environp[])
     errorExit(dest_fds == NULL ? FAILED : SUCCESS , "malloc(filesNum)");
 
 
-    src_fd = open(argv[1] , O_RDONLY );
+    src_fd = open(argv[optind] , O_RDONLY );
     errorExit(src_fd , "open(src_fd):");
 
-    openDestFiles(argv[1] , dest_fds , filesNum);                   //Open all the filesNum destination files
+    openDestFiles(argv[optind] , dest_fds , filesNum);                   //Open all the filesNum destination files
 
     int index = 0;                                                  //A variable to be used to index into the file descriptors array
     while( (rbytes = read(src_fd , buffer , fileLen)) )
