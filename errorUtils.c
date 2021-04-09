@@ -13,6 +13,6 @@ errorExit(int retVal,const char* msg)
 void
 usageErr()
 {
-    fprintf(stderr,"Usage: (./)split [OPTIONS] src_file\n");
+    fprintf(stderr,"Usage: (./)split [OPTIONS] src_file\nOptions:\n\ts - Size of each output file");
     exit(EXIT_FAILURE);
 }

@@ -25,6 +25,7 @@ int main(int argc , char* argv[] , char* environp[])
     int src_fd ,filesNum, *dest_fds;
     struct stat srcfile_stat;
     ssize_t rbytes , wbytes;
+    size_t fileLen = BUFSIZ;
 
     if(argc < 2)
         usageErr();
@@ -36,8 +37,8 @@ int main(int argc , char* argv[] , char* environp[])
      * The number of files is computed as file_size/buffer_size + 1 extra file 
      * to hold the remaining bytes if there are any 
      */
-    filesNum = ( srcfile_stat.st_size / BUFSIZ ) +
-               ( srcfile_stat.st_size % BUFSIZ == 0 ? 0 : 1 );
+    filesNum = ( srcfile_stat.st_size / fileLen ) +
+               ( srcfile_stat.st_size % fileLen == 0 ? 0 : 1 );
     
     dest_fds = (int*)malloc(filesNum * sizeof(int) );
     errorExit(dest_fds == NULL ? FAILED : SUCCESS , "malloc(filesNum)");
@@ -49,7 +50,7 @@ int main(int argc , char* argv[] , char* environp[])
     openDestFiles(argv[1] , dest_fds , filesNum);                   //Open all the filesNum destination files
 
     int index = 0;                                                  //A variable to be used to index into the file descriptors array
-    while( (rbytes = read(src_fd , buffer , BUFSIZ)) )
+    while( (rbytes = read(src_fd , buffer , fileLen)) )
     {
         errorExit(rbytes, "read(src_fd):");
 
