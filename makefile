@@ -1,4 +1,4 @@
-CC 			= cc
+CC 		= cc
 CPLFLAGS 	= -std=c17 -O3 -c -Wall -Werror
 BIN 		= split
 OBJS 		= main.o errorUtils.o
